@@ -1,4 +1,3 @@
-from audioop import reverse
 import random
 def gcd(a: int,b: int):
     return abs(a) if b==0 else gcd(b, a%b)
