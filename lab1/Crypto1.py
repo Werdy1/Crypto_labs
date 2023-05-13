@@ -6,7 +6,18 @@ def find_highest_power_of_two(n: int):
     # find the max 2**s that can divide number (n)
     return (n & (~(n - 1)))
 
-def miller_rabin_probability_test(n: int): # works fine for 7 digits, on 8 digits rapid increase in time (1!)
+def Horners_method(x: int, d: int, n: int = 0):
+    # x - base number; d - power of number; n - module (optional)
+    representation = (bin(d)[2:])
+    counter = d.bit_length()
+    result = x
+    for i in range(1, counter):
+        result = (result**2)*(x**int(representation[i]))
+        if n != 0:
+            result = result % n 
+    return result
+
+def miller_rabin_probability_test(n: int): 
     # if number(n) is prime the function will return True
     # otherwise False
     power_of_two = find_highest_power_of_two(n-1)
@@ -17,8 +28,10 @@ def miller_rabin_probability_test(n: int): # works fine for 7 digits, on 8 digit
         x = random.randint(2,n-1) # both ends includes
         if gcd(n,x) > 1:
             return False
-        print(x,d,n)
-        base = (x**d)%n # (1!) the problem is here //? algorithm for big powers // bigger than 4-digits pow claculate slow
+        if d > 9999:
+            base = Horners_method(x,d,n)
+        else:
+            base = (x**d)%n 
         if  base == 1 or base == (n - 1):
             continue
         for j in range(1,s):
@@ -75,4 +88,4 @@ def brillhart_morrison_method(n: int):
     pass
 
 number = int(input("Please, enter your number:"))
-print(pollards_p_method(number))
+print(miller_rabin_probability_test(number))
