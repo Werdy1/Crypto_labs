@@ -29,7 +29,7 @@ def miller_rabin_probability_test(n: int):
         if gcd(n,x) > 1:
             return False
         if d > 9999:
-            base = Horners_method(x,d,n)
+            base = horners_method(x,d,n)
         else:
             base = (x**d)%n 
         if  base == 1 or base == (n - 1):
