@@ -17,7 +17,8 @@ def miller_rabin_probability_test(n: int): # works fine for 7 digits, on 8 digit
         x = random.randint(2,n-1) # both ends includes
         if gcd(n,x) > 1:
             return False
-        base = (x**d)%n # (1!) the problem is here //? algorithm for big powers 
+        print(x,d,n)
+        base = (x**d)%n # (1!) the problem is here //? algorithm for big powers // bigger than 4-digits pow claculate slow
         if  base == 1 or base == (n - 1):
             continue
         for j in range(1,s):
@@ -30,8 +31,8 @@ def miller_rabin_probability_test(n: int): # works fine for 7 digits, on 8 digit
 
 def method_of_trial_divisions(n: int):
     # Since all numbers could be represented in bit, my B will be 2
-    answer = [] # list where found dividers will be stored
-                # if none dividers found empty list will be returned
+    answer = [n] # list where found dividers and new n will be stored
+                 # if none dividers found list with only n will be returned
     some_prime_numbers = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47]
     while n != 1:
         check = 1 # variable for checking if any prime nummber was found, to avoid infinite loop
@@ -44,19 +45,34 @@ def method_of_trial_divisions(n: int):
                 result = (result + int(representation[i]) * r) % poss_divider
                 r = (r * 2) % poss_divider
             if result == 0:
-                n = int(n/poss_divider) 
+                n = n//poss_divider # Changed for floor division, because normal division return double which cause problems
+                answer[0] = n
                 answer.append(poss_divider)
                 check = 0
                 break
         if check:
-            break
+            break  
     return answer
 
 def pollards_p_method(n: int):
-    pass
+    # this function will find one divider and after that ends
+    # I will use classic function: f(x) = x^2 + 1
+    answer = [n] # list where found dividers and new n will be stored
+                 # if none dividers found list with only n will be returned 
+    x = 2
+    y = 2
+    poss_divider = 1
+    while poss_divider == 1:
+        x = (x**2 + 1) % n
+        y = (y**4 + 2*(y**2) + 2) % n
+        poss_divider = gcd(y-x,n)
+    n = n//poss_divider
+    answer[0] = n
+    answer.append(poss_divider)  
+    return answer
 
 def brillhart_morrison_method(n: int):
     pass
 
 number = int(input("Please, enter your number:"))
-print(method_of_trial_divisions(number))
+print(pollards_p_method(number))
