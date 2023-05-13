@@ -6,7 +6,7 @@ def find_highest_power_of_two(n: int):
     # find the max 2**s that can divide number (n)
     return (n & (~(n - 1)))
 
-def Horners_method(x: int, d: int, n: int = 0):
+def horners_method(x: int, d: int, n: int = 0):
     # x - base number; d - power of number; n - module (optional)
     representation = (bin(d)[2:])
     counter = d.bit_length()
