@@ -1,5 +1,7 @@
 import random
 import time
+from math import sqrt,exp,log10,ceil
+
 def gcd(a: int,b: int):
     return abs(a) if b==0 else gcd(b, a%b)
 
@@ -25,6 +27,22 @@ def legendre_symbol (a: int,p: int):
     result = horners_method(a, power, p)
     if abs(result) > 1:
         result = 0
+    return result
+
+def sieve_of_eratosthenes(n: int):
+    # return prime number within range [2,n]
+    result = []
+    is_prime = [1]*(n+1)
+    is_prime[0], is_prime[1] = 0 , 0
+    for i in range(2,ceil(sqrt(n))):
+        if is_prime[i]:
+            j = i * i
+            while j < n + 1:
+                is_prime[j] = 0
+                j += i
+    for i in range(2,n+1):
+        if is_prime[i]:
+            result.append(i)
     return result
 
 def miller_rabin_probability_test(n: int): 
@@ -92,7 +110,10 @@ def pollards_p_method(n: int):
     return answer
 
 def brillhart_morrison_method(n: int):
+    a = 1/sqrt(2)
+    L = exp(sqrt(log10(n)*log10(log10(n))))
+    end = L**a
     pass
 
 number = int(input("Please, enter your number:"))
-print(legendre_symbol(1223324,1153723573))
+print(sieve_of_eratosthenes(number))
