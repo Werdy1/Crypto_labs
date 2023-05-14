@@ -1,4 +1,5 @@
 import random
+import time
 def gcd(a: int,b: int):
     return abs(a) if b==0 else gcd(b, a%b)
 
@@ -6,7 +7,7 @@ def find_highest_power_of_two(n: int):
     # find the max 2**s that can divide number (n)
     return (n & (~(n - 1)))
 
-def horners_method(x: int, d: int, n: int = 0):
+def horners_method(x: int, d: int, n: int = 0): # used to calculate big powers of number (more than 4 digits)
     # x - base number; d - power of number; n - module (optional)
     representation = (bin(d)[2:])
     counter = d.bit_length()
@@ -15,6 +16,15 @@ def horners_method(x: int, d: int, n: int = 0):
         result = (result**2)*(x**int(representation[i]))
         if n != 0:
             result = result % n 
+    return result
+
+def legendre_symbol (a: int,p: int):
+    # a - some integer; p - prime number
+    # I will count Legendre symbol using Euler's criterion
+    power = (p - 1)//2
+    result = horners_method(a, power, p)
+    if abs(result) > 1:
+        result = 0
     return result
 
 def miller_rabin_probability_test(n: int): 
@@ -28,10 +38,7 @@ def miller_rabin_probability_test(n: int):
         x = random.randint(2,n-1) # both ends includes
         if gcd(n,x) > 1:
             return False
-        if d > 9999:
-            base = horners_method(x,d,n)
-        else:
-            base = (x**d)%n 
+        base = horners_method(x,d,n)
         if  base == 1 or base == (n - 1):
             continue
         for j in range(1,s):
@@ -88,4 +95,4 @@ def brillhart_morrison_method(n: int):
     pass
 
 number = int(input("Please, enter your number:"))
-print(miller_rabin_probability_test(number))
+print(legendre_symbol(1223324,1153723573))
