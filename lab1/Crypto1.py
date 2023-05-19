@@ -51,6 +51,11 @@ def get_power_vector(n: int, base: list):
     counter = len(base)
     vector = [0] * counter
     i = 0
+    if base[0] == -1:
+        if n < 0:
+            vector[0] = 1
+            n = n//-1
+        i += 1
     while n!=1 and i < counter:
         if n % base[i] == 0: 
             n = n//base[i]
@@ -119,12 +124,13 @@ def miller_rabin_probability_test(n: int):
                 return False
     return True      
 
-def method_of_trial_divisions(n: int):
+def method_of_trial_divisions(n: int, some_prime_numbers: list = []):
     # n - integer to factorize; 
     # Since all numbers could be represented in bit, my B will be 2
     answer = [n] # list where found dividers and new n will be stored
                  # if none dividers found list with only n will be returned
-    some_prime_numbers = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47]
+    if some_prime_numbers == []:
+        some_prime_numbers = sieve_of_eratosthenes(n)
     while n != 1:
         check = 1 # variable for checking if any prime number was found, to avoid infinite loop
         t = n.bit_length()
@@ -170,19 +176,21 @@ def brillhart_morrison_method(n: int):
     L = exp(sqrt(log2(n)*log2(log2(n))))
     end = ceil(L**a)
     prime_numbers = sieve_of_eratosthenes(end)
-    factorial_base = [n-1]
+    factorial_base = [-1]
     for number in prime_numbers:
         if legendre_symbol(n,number) == 1:
             factorial_base.append(number)
     k = len(factorial_base)
     chain_fraction = [0] * (k+1)
-    U = 0
     V = 1
+    a = floor((sqrt(n)))
+    chain_fraction[0] = a
+    U = a
     for i in range(k + 1):
+        V = (n - U**2)//V
         a = floor((sqrt(n)+U)/V)
         chain_fraction[i] = a
         U = a * V - U
-        V = (n - U**2)//V
     b = [0] * (k+3)
     b[1] = 1
     b_squares = [0]*(k+1)
@@ -191,7 +199,7 @@ def brillhart_morrison_method(n: int):
         b_squares[i - 2] = (b[i]**2)%n
     matrix = [[]] * (k + 1)
     for i in range(k + 1):
-        matrix[i] = get_power_vector(b_squares[i],factorial_base)
+        matrix[i] = get_power_vector(b_squares[i],factorial_base)   
     vectors_combinations = gauss_method(matrix) 
     check = 1
     for combination in vectors_combinations:
@@ -217,7 +225,7 @@ def brillhart_morrison_method(n: int):
 while 1:
     print("Welcome, please choose what algorithm you want to use\n"\
           "1 - miller_rabin_probability_test\n"\
-          "2 - method_of_trial_divisions [2-47]\n"\
+          "2 - method_of_trial_divisions\n"\
           "3 - pollards_p_method\n"\
           "4 - brillhart_morrison_method\n"\
           "5 - Optimal (all at once)\n"\
@@ -226,30 +234,46 @@ while 1:
     n = input()
     if n == "1":
         number = int(input("Please, enter your number:"))
+        start = time.time()
         result = miller_rabin_probability_test(number)
+        end = time.time()
         print("Prime number" if result else "Not a prime number")
+        print("It takes:",end - start,"seconds")
     elif n == "2":
         number = int(input("Please, enter your number:"))
+        start = time.time()
         result = method_of_trial_divisions(number)
+        end = time.time()
         print(result)
+        print("It takes:",end - start,"seconds")
     elif n == "3":
         number = int(input("Please, enter your number:"))
+        start = time.time()
         result = pollards_p_method(number)
+        end = time.time()
         print(result)
+        print("It takes:",end - start,"seconds")
     elif n == "4":
         number = int(input("Please, enter your number:"))
+        start = time.time()
         result = brillhart_morrison_method(number)
+        end = time.time()
         print(result)
+        print("It takes:",end - start,"seconds")
     elif n == "5":
         number = int(input("Please, enter your number:"))
-        result = method_of_trial_divisions(number)
+        start = time.time()
+        some_prime_numbers = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47]
+        result = method_of_trial_divisions(number,some_prime_numbers)
         print(result)
         number = result[0]
         result = pollards_p_method(number)
         print(result)
         number = result[0]
         result = brillhart_morrison_method(number)
+        end = time.time()
         print(result)
+        print("It takes:",end - start,"seconds")
     elif n == "0":
         break
     else:
