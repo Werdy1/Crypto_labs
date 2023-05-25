@@ -7,6 +7,20 @@ def find_highest_power_of_two(n: int):
     # find the max 2**s that can divide number (n)
     return (n & (~(n - 1)))
 
+def find_inverted(n: int, p: int):
+    q_list = [0,1]
+    remainder = 0
+    mod = p
+    while remainder != 1:
+        remainder = p%n
+        q = (p-remainder)//n
+        q_list.append(-q)
+        p = n
+        n = remainder
+    for i in range(2,len(q_list)):
+        q_list[i] = (q_list[i]*q_list[i-1] + q_list[i-2])%mod
+    return q_list[-1]
+
 def miller_rabin_probability_test(n: int): 
     # if number(n) is prime the function will return True
     # otherwise False
@@ -133,8 +147,29 @@ def silver_polig_hellman_method(a: int, b:int,p: int):
     answer = -1 
     n = p - 1 # order of the group
     canonical_form = find_canonical_form(n)
-    print(canonical_form)
+    unique_canonical_form = set(canonical_form) # same canonical form, but where every number is unique
+    powers_of_canonical_form = {value: canonical_form.count(value) for value in unique_canonical_form}
+    for prime_number in unique_canonical_form:
+        table = [0]*prime_number
+        l = powers_of_canonical_form[prime_number]
+        equation = [0,prime_number**l]
+        for j in range(prime_number):
+            power = (n*j)//prime_number
+            if power > 999:
+                table[j] = horners_method(a,power,p)
+            else:
+                table[j] = (a**power)%p
+        # ******
+        x_seq = [0]*l+1
+        inverted_element = find_inverted(a,p)
+        for j in range(1,l+1):
+            power = n//(prime_number**j)
+            coef = inverted_element**(sum(x_seq[1:j]))
+            temp = ((b*coef)**power)%p
+            x_seq[j] = (table.index(temp))*(prime_number**j)
+    pass
+
     return answer
 
-n = int(input("Enter numbers:"))
-print(silver_polig_hellman_method(1,2,1))
+#n = int(input("Enter numbers:"))
+print(find_inverted(42,173))
