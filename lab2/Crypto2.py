@@ -108,6 +108,13 @@ def horners_method(x: int, d: int, n: int = 0): # used to calculate big powers o
             result = result % n 
     return result
 
+def chinese_remainder_theorem(equations: list, n: int):
+    # function returns power if finds one, or return 0
+    answer = 0
+    for equation in equations:
+        second = (n//equation[1])
+        answer += (equation[0]*second*(find_inverted(second,equation[1])))%n
+    return answer%n
 
 def try_method(a: int, b:int,p: int):
     # where  a - base (generator); b - field element; p - module (prime number)
@@ -149,6 +156,7 @@ def silver_polig_hellman_method(a: int, b:int,p: int):
     canonical_form = find_canonical_form(n)
     unique_canonical_form = set(canonical_form) # same canonical form, but where every number is unique
     powers_of_canonical_form = {value: canonical_form.count(value) for value in unique_canonical_form}
+    equations = []
     for prime_number in unique_canonical_form:
         table = [0]*prime_number
         l = powers_of_canonical_form[prime_number]
@@ -160,16 +168,17 @@ def silver_polig_hellman_method(a: int, b:int,p: int):
             else:
                 table[j] = (a**power)%p
         # ******
-        x_seq = [0]*l+1
+        x_seq = [0]*(l+1)
         inverted_element = find_inverted(a,p)
         for j in range(1,l+1):
             power = n//(prime_number**j)
-            coef = inverted_element**(sum(x_seq[1:j]))
+            coef = (inverted_element**(sum(x_seq[1:j])))%p
             temp = ((b*coef)**power)%p
-            x_seq[j] = (table.index(temp))*(prime_number**j)
-    pass
-
+            x_seq[j] = (table.index(temp))*(prime_number**(j-1))
+        equation[0] = sum(x_seq)
+        equations.append(equation)
+    answer = chinese_remainder_theorem(equations,n)
     return answer
 
 #n = int(input("Enter numbers:"))
-print(find_inverted(42,173))
+print(silver_polig_hellman_method(3,13,211))
