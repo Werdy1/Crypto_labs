@@ -1,6 +1,25 @@
 import time
 import random
 from math import ceil,sqrt
+import threading
+
+def gcd(a: int,b: int):
+    return abs(a) if b==0 else gcd(b, a%b)
+
+def find_highest_power_of_two(n: int):
+    # find the max 2**s that can divide number (n)
+    return (n & (~(n - 1)))
+
+def horners_method(x: int, d: int, n: int = 0): # used to calculate big powers of number (more than 4 digits)
+    # x - base number; d - power of number; n - module (optional)
+    representation = (bin(d)[2:])
+    counter = d.bit_length()
+    result = x
+    for i in range(1, counter):
+        result = (result**2)*(x**int(representation[i]))
+        if n != 0:
+            result = result % n 
+    return result
 
 def sieve_of_eratosthenes(n: int):
     # return prime number within range [2,n]
@@ -111,24 +130,55 @@ def find_canonical_form(n: int): # uses method of trial divisions and pollards p
             break
     return canonical_form
 
-def generate_equation(order: int):
+def find_field_generator(p: int):
+    # p - prime number;
+    n = p - 1
+    unique_canonic_form = set(find_canonical_form(n))
+    answer = 0 
+    for i in range(2,p):
+        check = 1 # check for possible generator
+        for number in unique_canonic_form:
+            if (i**(n//(number)))%p == 1:
+                check = 0
+                break
+        if check:
+            answer = i
+            break
+    return answer
 
-    pass
+
+def generate_equation(order: int):
+    prime_numbers = sieve_of_eratosthenes(10**order)
+    min_element = 10**(order - 1)
+    for i in range(len(prime_numbers)):
+        if prime_numbers[i] > min_element:
+            prime_numbers = prime_numbers[i:]
+            break
+    prime = random.choice(prime_numbers)
+    generator = find_field_generator(prime)
+    power = random.randint(2, prime - 2)
+
+    b = (generator**power)%prime
+    return [generator,power,b,prime]
 
 while 1:
     print("Welcome, please enter 1 when you are ready\n"\
-          "1 - try_method\n"\
-          "2 - silver_polig_hellman_method\n"\
+          "1 - generate the equation\n"\
           "0 - Exit"\
           )
     n = input()
     if n == "1":
         order = int(input("Please, enter your p number (prime number) order :"))
         start = time.time()
-        result = generate_equation(order)
+        generator,power,b,prime = generate_equation(order)
         end = time.time()
-        print(result)
-        print("It takes:",end - start,"seconds")
+        print("Equation generateds in:",end - start,"seconds")
+        print(f"Solve it if you dare: {generator}^x = {b} mod {prime}")
+        answer = int(input("Your answer: "))
+        if answer == power:
+            print("Congratulations!")
+        else:
+            print(f"Wrong, the right answer was {power}")
     elif n == "0":
         break
     else:
