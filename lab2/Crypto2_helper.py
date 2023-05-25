@@ -174,11 +174,32 @@ while 1:
         end = time.time()
         print("Equation generateds in:",end - start,"seconds")
         print(f"Solve it if you dare: {generator}^x = {b} mod {prime}")
-        answer = int(input("Your answer: "))
-        if answer == power:
-            print("Congratulations!")
+        # Set the timer duration in seconds
+        timer_duration = 300
+        
+        # Create a flag to indicate if user input has been received
+        user_input_received = False
+        answer = 0
+        # Function to wait for user input
+        def wait_for_input():
+            global answer
+            answer = int(input("Your answer: "))
+
+        # Create and start the thread for waiting user input
+        input_thread = threading.Thread(target=wait_for_input)
+        input_thread.start()
+        
+        # Wait for the timer or user input
+        input_thread.join(timeout=timer_duration)
+        
+        # Check if user input was received
+        if input_thread.is_alive():
+            print("\nTimer expired. Sorry you gotta be faster")
         else:
-            print(f"Wrong, the right answer was {power}")
+            if answer == power:
+                print("Congratulations!")
+            else:
+                print(f"Wrong, the right answer was {power}")
     elif n == "0":
         break
     else:
