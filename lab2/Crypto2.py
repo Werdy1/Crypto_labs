@@ -115,16 +115,19 @@ def silver_polig_hellman_method(a: int, b:int,p: int):
     # function returns power if finds one, or return -1
     answer = -1 
     n = p - 1 # order of the group
-    temp = n
-    canonical_form = []
+    dividers = method_of_trial_divisions(n)
+    temp = dividers[0]
+    canonical_form = dividers[1:] 
     while temp != 1:
-        numbers = pollards_p_method(temp)
-        if numbers[0] == temp:
+        dividers = pollards_p_method(temp)
+        temp = dividers[0]
+        if len(dividers)>1:
+            canonical_form.append(dividers[1])
+        else:
+            canonical_form.append(dividers[0])
             break
-        temp = numbers[0]
-        canonical_form.append(numbers[1])
     print(canonical_form)
     return answer
 
 n = int(input("Enter numbers:"))
-print(silver_polig_hellman_method(1,2,97))
+print(silver_polig_hellman_method(1,2,195))
