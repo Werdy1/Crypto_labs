@@ -105,6 +105,8 @@ def gauss_method(matrix: list):
 def miller_rabin_probability_test(n: int): 
     # if number(n) is prime the function will return True
     # otherwise False
+    if n==2:
+        return True
     power_of_two = find_highest_power_of_two(n-1)
     s = power_of_two.bit_length()
     d = int((n-1)/power_of_two) #for whatever reason it's not working with double, so converted to int (maybe somethig with) double representation
@@ -129,6 +131,12 @@ def method_of_trial_divisions(n: int, some_prime_numbers: list = []):
     # Since all numbers could be represented in bit, my B will be 2
     answer = [n] # list where found dividers and new n will be stored
                  # if none dividers found list with only n will be returned
+    if n ==1:
+        print("Number equals 1")
+        return answer
+    if miller_rabin_probability_test(n):
+        print("Already prime")
+        return answer
     if some_prime_numbers == []:
         some_prime_numbers = sieve_of_eratosthenes(n)
     while n != 1:
@@ -156,6 +164,12 @@ def pollards_p_method(n: int):
     # I will use classic function: f(x) = x^2 + 1
     answer = [n] # list where found dividers and new n will be stored
                  # if none dividers found list with only n will be returned 
+    if n ==1:
+        print("Number equals 1")
+        return answer
+    if miller_rabin_probability_test(n):
+        print("Already prime")
+        return answer
     x = 2
     y = 2
     poss_divider = 1
@@ -172,6 +186,12 @@ def brillhart_morrison_method(n: int):
     # this function will find one divider and after that ends
     answer = [n] # list where found dividers and new n will be stored
                  # if none dividers found list with only n will be returned
+    if n ==1:
+        print("Number equals 1")
+        return answer
+    if miller_rabin_probability_test(n):
+        print("Already prime")
+        return answer
     a = 1/sqrt(2)
     L = exp(sqrt(log2(n)*log2(log2(n))))
     end = ceil(L**a)
@@ -261,19 +281,37 @@ while 1:
         print(result)
         print("It takes:",end - start,"seconds")
     elif n == "5":
+        result = []
         number = int(input("Please, enter your number:"))
         start = time.time()
         some_prime_numbers = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47]
-        result = method_of_trial_divisions(number,some_prime_numbers)
-        print(result)
-        number = result[0]
-        result = pollards_p_method(number)
-        print(result)
-        number = result[0]
-        result = brillhart_morrison_method(number)
+        start_of_function = time.time()
+        temp = method_of_trial_divisions(number,some_prime_numbers)
+        end_of_function = time.time()
+        result = result + temp[1:]
+        print("Method of trial divisions:",temp)
+        print(end_of_function-start_of_function,"seconds")
+        number = temp[0]
+        start_of_function = time.time()
+        temp = pollards_p_method(number)
+        end_of_function = time.time()
+        result = result + temp[1:]
+        print("Pollards p method",temp)
+        print(end_of_function-start_of_function,"seconds")
+        
+        while number != temp[0]:
+            number = temp[0]
+            start_of_function = time.time()
+            temp = brillhart_morrison_method(number)
+            end_of_function = time.time()
+            result = result + temp[1:]
+            if len(temp) > 1:
+                print("Brillhart-Morrison method:",temp)
+            print(end_of_function-start_of_function,"seconds")
+        result += temp
         end = time.time()
+        print("All it takes:",end - start,"seconds")
         print(result)
-        print("It takes:",end - start,"seconds")
     elif n == "0":
         break
     else:
