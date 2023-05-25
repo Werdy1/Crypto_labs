@@ -36,7 +36,7 @@ def method_of_trial_divisions(n: int):
     # Since all numbers could be represented in bit, my B will be 2
     answer = [n] # list where found dividers and new n will be stored
                  # if none dividers found list with only n will be returned
-    if n ==1:
+    if n < 2:
         return answer
     if miller_rabin_probability_test(n):
         return answer
@@ -67,7 +67,7 @@ def pollards_p_method(n: int):
     answer = [n] # list where found dividers and new n will be stored
                  # if none dividers found list with only n will be returned 
 
-    if n == 1:
+    if n < 2:
         return answer
     if miller_rabin_probability_test(n):
         return answer
@@ -110,12 +110,11 @@ def try_method(a: int, b:int,p: int):
             break
     return answer
 
-def silver_polig_hellman_method(a: int, b:int,p: int):
-    # where  a - base (generator); b - field element; p - module (prime number)
-    # function returns power if finds one, or return -1
-    answer = -1 
-    n = p - 1 # order of the group
+def find_canonical_form(n: int): # uses method of trial divisions and pollards p method
+    # return canonical from
     dividers = method_of_trial_divisions(n)
+    if len(dividers) < 2:
+        return dividers
     temp = dividers[0]
     canonical_form = dividers[1:] 
     while temp != 1:
@@ -126,8 +125,16 @@ def silver_polig_hellman_method(a: int, b:int,p: int):
         else:
             canonical_form.append(dividers[0])
             break
+    return canonical_form
+
+def silver_polig_hellman_method(a: int, b:int,p: int):
+    # where  a - base (generator); b - field element; p - module (prime number)
+    # function returns power if finds one, or return -1
+    answer = -1 
+    n = p - 1 # order of the group
+    canonical_form = find_canonical_form(n)
     print(canonical_form)
     return answer
 
 n = int(input("Enter numbers:"))
-print(silver_polig_hellman_method(1,2,195))
+print(silver_polig_hellman_method(1,2,1))
