@@ -22,6 +22,17 @@ def find_inverted(n: int, p: int):
         q_list[i] = (q_list[i]*q_list[i-1] + q_list[i-2])%mod
     return q_list[-1]
 
+def horners_method(x: int, d: int, n: int = 0): # used to calculate big powers of number (more than 4 digits)
+    # x - base number; d - power of number; n - module (optional)
+    representation = (bin(d)[2:])
+    counter = d.bit_length()
+    result = x
+    for i in range(1, counter):
+        result = (result**2)*(x**int(representation[i]))
+        if n != 0:
+            result = result % n 
+    return result
+
 def miller_rabin_probability_test(n: int): 
     # if number(n) is prime the function will return True
     # otherwise False
@@ -97,17 +108,6 @@ def pollards_p_method(n: int):
     answer[0] = n
     answer.append(poss_divider)  
     return answer
-
-def horners_method(x: int, d: int, n: int = 0): # used to calculate big powers of number (more than 4 digits)
-    # x - base number; d - power of number; n - module (optional)
-    representation = (bin(d)[2:])
-    counter = d.bit_length()
-    result = x
-    for i in range(1, counter):
-        result = (result**2)*(x**int(representation[i]))
-        if n != 0:
-            result = result % n 
-    return result
 
 def chinese_remainder_theorem(equations: list, n: int):
     # function returns power if finds one, or return 0
