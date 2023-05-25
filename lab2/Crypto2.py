@@ -1,7 +1,7 @@
 def gcd(a: int,b: int):
     return abs(a) if b==0 else gcd(b, a%b)
 
-def pollards_p_method(n: int):
+def pollards_p_method(n: int): 
     # this function will find one divider and after that ends
     # I will use classic function: f(x) = x^2 + 1
     answer = [n] # list where found dividers and new n will be stored
@@ -30,13 +30,25 @@ def horners_method(x: int, d: int, n: int = 0): # used to calculate big powers o
     return result
 
 
-def try_method(n: int, a: int, b:int):
-    # where n - module; a - base; b - field element 
+def try_method(a: int, b:int,p: int):
+    # where  a - base (generator); b - field element; p - module (prime number)
+    # function returns power if finds one, or return -1
+    answer = -1 
+    n = p - 1 # order of the group
+    for i in range(p-1): # I will int by int try every power until I find one or until the loop ends
+        if i > 999:
+            temp = horners_method(a,i,p) # for huge powers I will use horners method
+        else:
+            temp = (a**i)%p
+        if temp == b:
+            answer = i
+            break
+    return answer
+
+def silver_polig_hellman(a: int, b:int,p: int):
+    # where  a - base (generator); b - field element; p - module (prime number)
+    n = p - 1 # order of the group
     pass
 
-def silver_polig_hellman(n: int, a: int, b:int):
-    # where n - module; a - base; b - field element 
-    pass
-
-n = int(input("Enter a number:"))
-print(n)
+n = int(input("Enter numbers:"))
+print(try_method(5,11,73))
