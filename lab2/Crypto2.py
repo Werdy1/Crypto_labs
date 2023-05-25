@@ -1,4 +1,5 @@
 import random
+import time
 
 def gcd(a: int,b: int):
     return abs(a) if b==0 else gcd(b, a%b)
@@ -132,7 +133,7 @@ def try_method(a: int, b:int,p: int):
     return answer
 
 def find_canonical_form(n: int): # uses method of trial divisions and pollards p method
-    # return canonical from
+    # return canonical form
     dividers = method_of_trial_divisions(n)
     if len(dividers) < 2:
         return dividers
@@ -180,5 +181,32 @@ def silver_polig_hellman_method(a: int, b:int,p: int):
     answer = chinese_remainder_theorem(equations,n)
     return answer
 
-#n = int(input("Enter numbers:"))
-print(silver_polig_hellman_method(3,13,211))
+while 1:
+    print("Welcome, please choose what algorithm you want to use\n"\
+          "1 - try_method\n"\
+          "2 - silver_polig_hellman_method\n"\
+          "0 - Exit"\
+          )
+    n = input()
+    if n == "1":
+        a = int(input("Please, enter your a number (generator):"))
+        b = int(input("Please, enter your b number (field element):"))
+        p = int(input("Please, enter your p number (prime number):"))
+        start = time.time()
+        result = try_method(a,b,p)
+        end = time.time()
+        print(result)
+        print("It takes:",end - start,"seconds")
+    elif n == "2":
+        a = int(input("Please, enter your a number (generator):"))
+        b = int(input("Please, enter your b number (field element):"))
+        p = int(input("Please, enter your p number (prime number):"))
+        start = time.time()
+        result = silver_polig_hellman_method(a,b,p)
+        end = time.time()
+        print(result)
+        print("It takes:",end - start,"seconds")
+    elif n == "0":
+        break
+    else:
+        print("Can't understand what do you want. Please, try againg")
