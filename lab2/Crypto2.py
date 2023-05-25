@@ -31,17 +31,45 @@ def miller_rabin_probability_test(n: int):
                 return False
     return True
 
+def method_of_trial_divisions(n: int):
+    # n - integer to factorize; 
+    # Since all numbers could be represented in bit, my B will be 2
+    answer = [n] # list where found dividers and new n will be stored
+                 # if none dividers found list with only n will be returned
+    if n ==1:
+        return answer
+    if miller_rabin_probability_test(n):
+        return answer
+    some_prime_numbers = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47]
+    while n != 1:
+        check = 1 # variable for checking if any prime number was found, to avoid infinite loop
+        t = n.bit_length()
+        representation = (bin(n)[:1:-1])
+        for poss_divider in some_prime_numbers:
+            r = 1
+            result = 0
+            for i in range(t):
+                result = (result + int(representation[i]) * r) % poss_divider
+                r = (r * 2) % poss_divider
+            if result == 0:
+                n = n//poss_divider # Changed for floor division, because normal division return double which cause problems
+                answer[0] = n
+                answer.append(poss_divider)
+                check = 0
+                break
+        if check:
+            break  
+    return answer
+
 def pollards_p_method(n: int): 
     # this function will find one divider and after that ends
     # I will use classic function: f(x) = x^2 + 1
     answer = [n] # list where found dividers and new n will be stored
                  # if none dividers found list with only n will be returned 
 
-    if n ==1:
-        print("Number equals 1")
+    if n == 1:
         return answer
     if miller_rabin_probability_test(n):
-        print("Already prime")
         return answer
     x = 2
     y = 2
@@ -82,17 +110,21 @@ def try_method(a: int, b:int,p: int):
             break
     return answer
 
-def silver_polig_hellman(a: int, b:int,p: int):
+def silver_polig_hellman_method(a: int, b:int,p: int):
     # where  a - base (generator); b - field element; p - module (prime number)
+    # function returns power if finds one, or return -1
+    answer = -1 
     n = p - 1 # order of the group
     temp = n
     canonical_form = []
     while temp != 1:
-        numbers = pollards_p_method(n) # to do: add handling of infinite loop, if temp is prime?
+        numbers = pollards_p_method(temp)
+        if numbers[0] == temp:
+            break
         temp = numbers[0]
-        canonical_form.append(temp[1])
-    
-    pass
+        canonical_form.append(numbers[1])
+    print(canonical_form)
+    return answer
 
 n = int(input("Enter numbers:"))
-print(try_method(2,13,37))
+print(silver_polig_hellman_method(1,2,97))
