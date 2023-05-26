@@ -1,5 +1,6 @@
 import random
 import time
+import threading
 
 def gcd(a: int,b: int):
     return abs(a) if b==0 else gcd(b, a%b)
@@ -192,9 +193,18 @@ while 1:
         a = int(input("Please, enter your a number (generator):"))
         b = int(input("Please, enter your b number (field element):"))
         p = int(input("Please, enter your p number (prime number):"))
+        result = 0
+        def wait_for_try_method(a,b,p):
+            global result
+            result = try_method(a,b,p)
+        input_thread = threading.Thread(target=wait_for_try_method, args=(a,b,p)) 
         start = time.time()
-        result = try_method(a,b,p)
+        input_thread.start()                                                       
+        input_thread.join(timeout=300)
         end = time.time()
+        if input_thread.is_alive():
+            print("Timer expired. Sorry this try_method limit")
+            continue
         print(result)
         print("It takes:",end - start,"seconds")
     elif n == "2":
