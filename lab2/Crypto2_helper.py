@@ -169,30 +169,28 @@ while 1:
     n = input()
     if n == "1":
         order = int(input("Please, enter your p number (prime number) order :"))
-        start = time.time()
-        generator,power,b,prime = generate_equation(order)
-        end = time.time()
-        print("Equation generateds in:",end - start,"seconds")
+        generator,power,b,prime = 0,0,0,0 
+
+        def wait_for_generating(order):
+            global generator,power,b,prime
+            generator,power,b,prime = generate_equation(order)
+
+        input_thread = threading.Thread(target=wait_for_generating, args=(order,)) #This coma here is essential, without it
+        input_thread.start()                                                       # code won't work
+        input_thread.join(timeout=600)
+        if input_thread.is_alive():
+            print("Timer expired. Sorry this is program limit")
+            continue
         print(f"Solve it if you dare: {generator}^x = {b} mod {prime}")
-        # Set the timer duration in seconds
-        timer_duration = 300
-        
-        # Create a flag to indicate if user input has been received
-        user_input_received = False
         answer = 0
-        # Function to wait for user input
+
         def wait_for_input():
             global answer
             answer = int(input("Your answer: "))
 
-        # Create and start the thread for waiting user input
         input_thread = threading.Thread(target=wait_for_input)
         input_thread.start()
-        
-        # Wait for the timer or user input
-        input_thread.join(timeout=timer_duration)
-        
-        # Check if user input was received
+        input_thread.join(timeout=300)
         if input_thread.is_alive():
             print("\nTimer expired. Sorry you gotta be faster")
         else:
