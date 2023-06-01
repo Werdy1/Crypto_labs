@@ -118,6 +118,9 @@ def find_canonical_form(n: int): # uses method of trial divisions and pollards p
             break
     return canonical_form
 
+def get_power_vector(alpha: int):
+    pass
+
 def index_calculus(a: int, b:int,p: int):
     # where  a - base (generator); b - field element; p - module (prime number)
     # function returns power if finds one, or return -1
@@ -126,7 +129,14 @@ def index_calculus(a: int, b:int,p: int):
     c = 3.38
     B = c * exp(0.5 * sqrt(log2(n) * log2(log2(n))))
     factorial_base = sieve_of_eratosthenes(B)
-
+    enough_amount_of_vecotrs = len(factorial_base) + 5
+    prev = 1
+    for k in range(1,n):
+        alpha_k = (prev * a) % p
+        if get_power_vector(alpha_k):
+            enough_amount_of_vecotrs -= 1
+            if enough_amount_of_vecotrs == 0:
+                break
     return answer
 
 while 1:
