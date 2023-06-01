@@ -139,10 +139,43 @@ def get_power_vector(alpha: int, base: list):
             break
     return power_vector
 
-def gaussian_elimination(matrix: list):
+def gaussian_elimination(matrix: list, width: int, height: int):
     # must receive the matrix (2d list)
     # answer is 2d array; pairs (variable, value)
-    pass
+    # time complexity O(n^3), where n is number of unknown variables
+    result = [0]*width
+    pivot_row = 0
+    pivot_column = 0
+    pivot_coords = []
+    while pivot_row < height and pivot_column < width: # forward direction
+        row = -1
+        for i in range(pivot_row, height):
+            if matrix[i][pivot_column] != 0:   # find the pivot_row
+                row = i
+                break
+        if row == -1:
+            pivot_column += 1 # if no raw found, change the column
+            continue
+        matrix[row], matrix[pivot_row] = matrix[pivot_row], matrix[row] # swap the rows
+        pivot_coords.append([pivot_row,pivot_column])
+        for i in range(pivot_row + 1, height):
+            coef = matrix[i][pivot_column] / matrix[pivot_row][pivot_column]
+            matrix[i][pivot_column] = 0
+            for j in range(pivot_column + 1, width + 1):
+                matrix[i][j] -= matrix[pivot_row][j] * coef
+        pivot_row += 1
+        pivot_column += 1
+    for coords in pivot_coords[::-1]: # back direction
+        row = coords[0]
+        column = coords[1]
+        matrix[row][width] /= matrix[row][column]
+        matrix[row][column] = 1
+        result[column] = matrix[row][width]
+        for i in range(row):
+            coef = matrix[i][column] / matrix[row][column]
+            matrix[i][column] = 0
+            matrix[i][width] -=  matrix[row][width]* coef
+    return result
 
 def index_calculus(a: int, b:int,p: int):
     # where  a - base (generator); b - field element; p - module (prime number)
@@ -153,19 +186,21 @@ def index_calculus(a: int, b:int,p: int):
     B = c * exp(0.5 * sqrt(log2(n) * log2(log2(n))))
     factorial_base = sieve_of_eratosthenes(floor(B))
     factorial_base.sort()
-    enough_amount_of_vecotrs = len(factorial_base) + 5
+    factorial_base_len = len(factorial_base)
+    enough_amount_of_vecotrs = factorial_base_len + 5
     vectors = []
-    vectors_values = []
     prev = 1
     for k in range(1,n):
         alpha_k = (prev * a) % p
-        vector = get_power_vector(alpha_k, factorial_base)
-        if vector:
+        vector = get_power_vector(alpha_k, factorial_base) + [k]
+        prev = alpha_k
+        if len(vector) > 1:
             vectors.append(vector)
-            vectors_values.append(k)
             enough_amount_of_vecotrs -= 1
             if enough_amount_of_vecotrs == 0:
                 break
+    values = gaussian_elimination(vectors, factorial_base_len, enough_amount_of_vecotrs)
+    print(values)
     return answer
 
 while 1:
@@ -178,7 +213,7 @@ while 1:
         #a = int(input("Please, enter your a number (generator):"))
         #b = int(input("Please, enter your b number (field element):"))
         #p = int(input("Please, enter your p number (prime number):"))
-        print(index_calculus(10,17,47))
+        print(gaussian_elimination([[1,3,-2,5],[3,5,6,7],[2,4,3,8]],3,3))
     elif n == "0":
         break
     else:
