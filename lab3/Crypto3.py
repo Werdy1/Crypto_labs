@@ -166,16 +166,16 @@ def gaussian_elimination(matrix: list, width: int, height: int):
                 matrix[i][j] -= matrix[pivot_row][j] * coef
         pivot_row += 1
         pivot_column += 1
-    #for coords in pivot_coords[::-1]: # back direction
-    #    row = coords[0]
-    #    column = coords[1]
-    #    matrix[row][width] /= matrix[row][column]
-    #    matrix[row][column] = 1
-    #    result[column] = matrix[row][width]
-    #    for i in range(row):
-    #        coef = matrix[i][column] / matrix[row][column]
-    #        matrix[i][column] = 0
-    #        matrix[i][width] -=  matrix[row][width]* coef
+    for coords in pivot_coords[::-1]: # back direction
+        row = coords[0]
+        column = coords[1]
+        matrix[row][width] /= matrix[row][column]
+        matrix[row][column] = 1
+        result[column] = matrix[row][width]
+        for i in range(row):
+            coef = matrix[i][column] / matrix[row][column]
+            matrix[i][column] = 0
+            matrix[i][width] -=  matrix[row][width]* coef
     return result
 
 def is_linearly_independent(matrix, new_vector):
@@ -202,22 +202,20 @@ def index_calculus(a: int, b:int,p: int):
     factorial_base_len = len(factorial_base)
     enough_amount_of_vecotrs = factorial_base_len
     vectors = []
-    vectos_values = []
+    #vectos_values = []
     prev = 1
-    amount_of_vectors = 0
+    amount_of_vectors = 0 
     while enough_amount_of_vecotrs != amount_of_vectors:
         k = random.choice(range(1,n)) 
         alpha_k = (prev * a) % p
-        vector = get_power_vector(alpha_k, factorial_base)
+        vector = get_power_vector(alpha_k, factorial_base) + [k]
         prev = alpha_k
-        if vector:
-            if is_linearly_independent(vectors, vector):
+        if len(vector)>2:
+            #if is_linearly_independent(vectors, vector):
                 vectors.append(vector)
-                vectos_values.append(k)
+                #vectos_values.append(k)
                 amount_of_vectors += 1
-    matrix_body = np.array(vectors)
-    matrix_values = np.array(vectos_values)
-    values = np.linalg.solve(matrix_body, matrix_values)
+    values = gaussian_elimination(vectors, factorial_base_len, enough_amount_of_vecotrs)
     while 1:
         l = random.choice(range(1,n))
         candidate = (b * pow(a,l,p))%p
