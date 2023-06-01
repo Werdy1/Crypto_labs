@@ -1,6 +1,6 @@
 import time
 import random
-from math import exp, log2, sqrt, ceil
+from math import exp, log2, sqrt, ceil, floor
 
 def gcd(a: int,b: int):
     return abs(a) if b==0 else gcd(b, a%b)
@@ -139,6 +139,11 @@ def get_power_vector(alpha: int, base: list):
             break
     return power_vector
 
+def gaussian_elimination(matrix: list):
+    # must receive the matrix (2d list)
+    # answer is 2d array; pairs (variable, value)
+    pass
+
 def index_calculus(a: int, b:int,p: int):
     # where  a - base (generator); b - field element; p - module (prime number)
     # function returns power if finds one, or return -1
@@ -146,14 +151,18 @@ def index_calculus(a: int, b:int,p: int):
     n = p - 1 # order of the group
     c = 3.38
     B = c * exp(0.5 * sqrt(log2(n) * log2(log2(n))))
-    factorial_base = sieve_of_eratosthenes(B)
+    factorial_base = sieve_of_eratosthenes(floor(B))
     factorial_base.sort()
     enough_amount_of_vecotrs = len(factorial_base) + 5
+    vectors = []
+    vectors_values = []
     prev = 1
     for k in range(1,n):
         alpha_k = (prev * a) % p
         vector = get_power_vector(alpha_k, factorial_base)
         if vector:
+            vectors.append(vector)
+            vectors_values.append(k)
             enough_amount_of_vecotrs -= 1
             if enough_amount_of_vecotrs == 0:
                 break
@@ -169,7 +178,7 @@ while 1:
         #a = int(input("Please, enter your a number (generator):"))
         #b = int(input("Please, enter your b number (field element):"))
         #p = int(input("Please, enter your p number (prime number):"))
-        print(get_power_vector(169400*19,[2,3,5,7,11]))
+        print(index_calculus(10,17,47))
     elif n == "0":
         break
     else:
