@@ -1,6 +1,7 @@
 import time
 import random
 from math import exp, log10, sqrt, ceil, floor
+import numpy as np
 
 def gcd(a: int,b: int):
     return abs(a) if b==0 else gcd(b, a%b)
@@ -165,17 +166,29 @@ def gaussian_elimination(matrix: list, width: int, height: int):
                 matrix[i][j] -= matrix[pivot_row][j] * coef
         pivot_row += 1
         pivot_column += 1
-    for coords in pivot_coords[::-1]: # back direction
-        row = coords[0]
-        column = coords[1]
-        matrix[row][width] /= matrix[row][column]
-        matrix[row][column] = 1
-        result[column] = matrix[row][width]
-        for i in range(row):
-            coef = matrix[i][column] / matrix[row][column]
-            matrix[i][column] = 0
-            matrix[i][width] -=  matrix[row][width]* coef
+    #for coords in pivot_coords[::-1]: # back direction
+    #    row = coords[0]
+    #    column = coords[1]
+    #    matrix[row][width] /= matrix[row][column]
+    #    matrix[row][column] = 1
+    #    result[column] = matrix[row][width]
+    #    for i in range(row):
+    #        coef = matrix[i][column] / matrix[row][column]
+    #        matrix[i][column] = 0
+    #        matrix[i][width] -=  matrix[row][width]* coef
     return result
+
+def is_linearly_independent(matrix, new_vector):
+    if len(matrix) == 0:
+        return True  # first vector
+    else:
+        new_matrix = np.vstack((matrix, new_vector))
+        rank_original = np.linalg.matrix_rank(matrix)
+        rank_new = np.linalg.matrix_rank(new_matrix)
+        if rank_new > rank_original:
+            return True  # vector is linearly independent
+        else:
+            return False
 
 def index_calculus(a: int, b:int,p: int):
     # where  a - base (generator); b - field element; p - module (prime number)
@@ -187,29 +200,34 @@ def index_calculus(a: int, b:int,p: int):
     factorial_base = sieve_of_eratosthenes(floor(B))
     factorial_base.sort()
     factorial_base_len = len(factorial_base)
-    enough_amount_of_vecotrs = factorial_base_len + 5
+    enough_amount_of_vecotrs = factorial_base_len
     vectors = []
+    vectos_values = []
     prev = 1
     amount_of_vectors = 0
-    for k in range(1, n):
+    while enough_amount_of_vecotrs != amount_of_vectors:
+        k = random.choice(range(1,n)) 
         alpha_k = (prev * a) % p
-        vector = get_power_vector(alpha_k, factorial_base) + [k]
+        vector = get_power_vector(alpha_k, factorial_base)
         prev = alpha_k
-        if len(vector) > 1:
-            vectors.append(vector)
-            amount_of_vectors += 1
-            if enough_amount_of_vecotrs == amount_of_vectors:
-                break
-    values = gaussian_elimination(vectors, factorial_base_len, enough_amount_of_vecotrs)
-    for l in range(0, n):
+        if vector:
+            if is_linearly_independent(vectors, vector):
+                vectors.append(vector)
+                vectos_values.append(k)
+                amount_of_vectors += 1
+    matrix_body = np.array(vectors)
+    matrix_values = np.array(vectos_values)
+    values = np.linalg.solve(matrix_body, matrix_values)
+    while 1:
+        l = random.choice(range(1,n))
         candidate = (b * pow(a,l,p))%p
         vector = get_power_vector(candidate, factorial_base)
         if vector:
             answer = 0
             for i in range(factorial_base_len):
                 if vector[i] != 0:
-                    answer += (vector[i] * values[i]) % n
-            answer = round((answer - l) % n)
+                    answer += (vector[i] * (values[i] % n)) % n
+            answer = (answer - l) % n
             break
     return answer
 
