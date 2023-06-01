@@ -118,8 +118,26 @@ def find_canonical_form(n: int): # uses method of trial divisions and pollards p
             break
     return canonical_form
 
-def get_power_vector(alpha: int):
-    pass
+def get_power_vector(alpha: int, base: list):
+    # will return power vector of a number, otherwise empty list
+    # uses custom base to make a vector
+    # for proper functioning requires a sorted list
+    base_len = len(base)
+    power_vector = [0] * base_len
+    canonical_form = find_canonical_form(alpha)
+    for number in canonical_form:
+        check = 0 # check for snooth number; 0 - smooth, 1 - not smooth
+        for i in range(base_len):
+            if number == base[i]:
+                power_vector[i] += 1
+                break
+            elif i == (base_len - 1): # happens only if alpha is not smooth
+                check = 1
+                break
+        if check:
+            power_vector = []
+            break
+    return power_vector
 
 def index_calculus(a: int, b:int,p: int):
     # where  a - base (generator); b - field element; p - module (prime number)
@@ -129,11 +147,13 @@ def index_calculus(a: int, b:int,p: int):
     c = 3.38
     B = c * exp(0.5 * sqrt(log2(n) * log2(log2(n))))
     factorial_base = sieve_of_eratosthenes(B)
+    factorial_base.sort()
     enough_amount_of_vecotrs = len(factorial_base) + 5
     prev = 1
     for k in range(1,n):
         alpha_k = (prev * a) % p
-        if get_power_vector(alpha_k):
+        vector = get_power_vector(alpha_k, factorial_base)
+        if vector:
             enough_amount_of_vecotrs -= 1
             if enough_amount_of_vecotrs == 0:
                 break
@@ -146,10 +166,10 @@ while 1:
           )
     n = input()
     if n == "1":
-        a = int(input("Please, enter your a number (generator):"))
-        b = int(input("Please, enter your b number (field element):"))
-        p = int(input("Please, enter your p number (prime number):"))
-        print()
+        #a = int(input("Please, enter your a number (generator):"))
+        #b = int(input("Please, enter your b number (field element):"))
+        #p = int(input("Please, enter your p number (prime number):"))
+        print(get_power_vector(169400*19,[2,3,5,7,11]))
     elif n == "0":
         break
     else:
