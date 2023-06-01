@@ -1,5 +1,6 @@
 import time
 import random
+from math import exp, log2, sqrt, ceil
 
 def gcd(a: int,b: int):
     return abs(a) if b==0 else gcd(b, a%b)
@@ -7,6 +8,22 @@ def gcd(a: int,b: int):
 def find_highest_power_of_two(n: int):
     # find the max 2**s that can divide number (n)
     return (n & (~(n - 1)))
+
+def sieve_of_eratosthenes(n: int):
+    # return prime number within range [2,n]
+    result = []
+    is_prime = [1]*(n+1)
+    is_prime[0], is_prime[1] = 0 , 0
+    for i in range(2,ceil(sqrt(n))):
+        if is_prime[i]:
+            j = i * i
+            while j < n + 1:
+                is_prime[j] = 0
+                j += i
+    for i in range(2,n+1):
+        if is_prime[i]:
+            result.append(i)
+    return result
 
 def miller_rabin_probability_test(n: int): 
     # if number(n) is prime the function will return True
@@ -101,10 +118,16 @@ def find_canonical_form(n: int): # uses method of trial divisions and pollards p
             break
     return canonical_form
 
-def index_calculus():
-    #
+def index_calculus(a: int, b:int,p: int):
+    # where  a - base (generator); b - field element; p - module (prime number)
+    # function returns power if finds one, or return -1
+    answer = -1 
+    n = p - 1 # order of the group
     c = 3.38
-    pass
+    B = c * exp(0.5 * sqrt(log2(n) * log2(log2(n))))
+    factorial_base = sieve_of_eratosthenes(B)
+
+    return answer
 
 while 1:
     print("Welcome, please enter 1 when you are ready\n"\
