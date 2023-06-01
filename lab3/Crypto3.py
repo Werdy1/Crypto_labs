@@ -1,6 +1,6 @@
 import time
 import random
-from math import exp, log2, sqrt, ceil, floor
+from math import exp, log10, sqrt, ceil, floor
 
 def gcd(a: int,b: int):
     return abs(a) if b==0 else gcd(b, a%b)
@@ -183,24 +183,34 @@ def index_calculus(a: int, b:int,p: int):
     answer = -1 
     n = p - 1 # order of the group
     c = 3.38
-    B = c * exp(0.5 * sqrt(log2(n) * log2(log2(n))))
+    B = c * exp(0.5 * sqrt(log10(n) * log10(log10(n))))
     factorial_base = sieve_of_eratosthenes(floor(B))
     factorial_base.sort()
     factorial_base_len = len(factorial_base)
     enough_amount_of_vecotrs = factorial_base_len + 5
     vectors = []
     prev = 1
-    for k in range(1,n):
+    amount_of_vectors = 0
+    for k in range(1, n):
         alpha_k = (prev * a) % p
         vector = get_power_vector(alpha_k, factorial_base) + [k]
         prev = alpha_k
         if len(vector) > 1:
             vectors.append(vector)
-            enough_amount_of_vecotrs -= 1
-            if enough_amount_of_vecotrs == 0:
+            amount_of_vectors += 1
+            if enough_amount_of_vecotrs == amount_of_vectors:
                 break
     values = gaussian_elimination(vectors, factorial_base_len, enough_amount_of_vecotrs)
-    print(values)
+    for l in range(0, n):
+        candidate = (b * pow(a,l,p))%p
+        vector = get_power_vector(candidate, factorial_base)
+        if vector:
+            answer = 0
+            for i in range(factorial_base_len):
+                if vector[i] != 0:
+                    answer += (vector[i] * values[i]) % n
+            answer = round((answer - l) % n)
+            break
     return answer
 
 while 1:
@@ -210,10 +220,10 @@ while 1:
           )
     n = input()
     if n == "1":
-        #a = int(input("Please, enter your a number (generator):"))
-        #b = int(input("Please, enter your b number (field element):"))
-        #p = int(input("Please, enter your p number (prime number):"))
-        print(gaussian_elimination([[1,3,-2,5],[3,5,6,7],[2,4,3,8]],3,3))
+        a = int(input("Please, enter your a number (generator):"))
+        b = int(input("Please, enter your b number (field element):"))
+        p = int(input("Please, enter your p number (prime number):"))
+        print(index_calculus(a,b,p))
     elif n == "0":
         break
     else:
