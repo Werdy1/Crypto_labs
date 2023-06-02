@@ -160,10 +160,10 @@ def gaussian_elimination(matrix: list, width: int, height: int):
         matrix[row], matrix[pivot_row] = matrix[pivot_row], matrix[row] # swap the rows
         pivot_coords.append([pivot_row,pivot_column])
         for i in range(pivot_row + 1, height):
-            coef = matrix[i][pivot_column] / matrix[pivot_row][pivot_column]
-            matrix[i][pivot_column] = 0
-            for j in range(pivot_column + 1, width + 1):
-                matrix[i][j] -= matrix[pivot_row][j] * coef
+            coef = matrix[i][pivot_column] / matrix[pivot_row][pivot_column] #Problem is here: I work in multiplicative group,
+            matrix[i][pivot_column] = 0                                      # so division must be replaced with multiplying on
+            for j in range(pivot_column + 1, width + 1):                     # inverse element
+                matrix[i][j] -= matrix[pivot_row][j] * coef                  
         pivot_row += 1
         pivot_column += 1
     for coords in pivot_coords[::-1]: # back direction
@@ -205,8 +205,7 @@ def index_calculus(a: int, b:int,p: int):
     vectos_values = []
     amount_of_vectors = 0 
     k=0
-    while enough_amount_of_vecotrs != amount_of_vectors:
-        #k = random.choice(range(1,n)) 
+    while (enough_amount_of_vecotrs != amount_of_vectors) and k < n:
         alpha_k = pow(a,k,p)
         vector = get_power_vector(alpha_k, factorial_base) 
         if vector:
@@ -215,12 +214,13 @@ def index_calculus(a: int, b:int,p: int):
                 vectos_values.append(k)
                 amount_of_vectors += 1
         k+=1
+    if enough_amount_of_vecotrs != amount_of_vectors:
+        return answer
     for i in range(enough_amount_of_vecotrs):
         vectors[i].append(vectos_values[i])
     values = gaussian_elimination(vectors, factorial_base_len, enough_amount_of_vecotrs)
     l=0
-    while 1:
-        #l = random.choice(range(1,n))
+    while l < n:
         candidate = (b * pow(a,l,p))%p
         vector = get_power_vector(candidate, factorial_base)
         if vector:
