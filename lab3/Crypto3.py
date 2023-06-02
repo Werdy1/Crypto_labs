@@ -202,31 +202,37 @@ def index_calculus(a: int, b:int,p: int):
     factorial_base_len = len(factorial_base)
     enough_amount_of_vecotrs = factorial_base_len
     vectors = []
-    #vectos_values = []
-    prev = 1
+    vectos_values = []
     amount_of_vectors = 0 
+    k=0
     while enough_amount_of_vecotrs != amount_of_vectors:
-        k = random.choice(range(1,n)) 
-        alpha_k = (prev * a) % p
-        vector = get_power_vector(alpha_k, factorial_base) + [k]
-        prev = alpha_k
-        if len(vector)>2:
-            #if is_linearly_independent(vectors, vector):
+        #k = random.choice(range(1,n)) 
+        alpha_k = pow(a,k,p)
+        vector = get_power_vector(alpha_k, factorial_base) 
+        if vector:
+            if is_linearly_independent(vectors, vector):
                 vectors.append(vector)
-                #vectos_values.append(k)
+                vectos_values.append(k)
                 amount_of_vectors += 1
+        k+=1
+    for i in range(enough_amount_of_vecotrs):
+        vectors[i].append(vectos_values[i])
     values = gaussian_elimination(vectors, factorial_base_len, enough_amount_of_vecotrs)
+    l=0
     while 1:
-        l = random.choice(range(1,n))
+        #l = random.choice(range(1,n))
         candidate = (b * pow(a,l,p))%p
         vector = get_power_vector(candidate, factorial_base)
         if vector:
             answer = 0
             for i in range(factorial_base_len):
                 if vector[i] != 0:
-                    answer += (vector[i] * (values[i] % n)) % n
-            answer = (answer - l) % n
-            break
+                    answer += (vector[i] * values[i]) % n
+            answer = round(answer - l) % n
+            temp = pow(a,answer,p)#
+            if temp == b:         # This is cheating
+                break             #
+        l+=1
     return answer
 
 while 1:
@@ -239,7 +245,11 @@ while 1:
         a = int(input("Please, enter your a number (generator):"))
         b = int(input("Please, enter your b number (field element):"))
         p = int(input("Please, enter your p number (prime number):"))
-        print(index_calculus(a,b,p))
+        start = time.time()
+        result = index_calculus(a,b,p)
+        end = time.time()
+        print(result)
+        print("It takes:",end - start,"seconds")
     elif n == "0":
         break
     else:
